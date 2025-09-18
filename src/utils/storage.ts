@@ -6,11 +6,16 @@ const STORAGE_KEYS = {
   NOTIFICATION_SETTINGS: 'fridgemind_notification_settings',
 } as const;
 
+const getStorageKey = (baseKey: string, userId?: string): string => {
+  return userId ? `${baseKey}_${userId}` : baseKey;
+};
+
 export const storage = {
   // Grocery Items
-  getGroceryItems: (): GroceryItem[] => {
+  getGroceryItems: (userId?: string): GroceryItem[] => {
     try {
-      const items = localStorage.getItem(STORAGE_KEYS.GROCERY_ITEMS);
+      const key = getStorageKey(STORAGE_KEYS.GROCERY_ITEMS, userId);
+      const items = localStorage.getItem(key);
       if (!items) return [];
       return JSON.parse(items).map((item: any) => ({
         ...item,
@@ -23,18 +28,20 @@ export const storage = {
     }
   },
 
-  saveGroceryItems: (items: GroceryItem[]): void => {
+  saveGroceryItems: (items: GroceryItem[], userId?: string): void => {
     try {
-      localStorage.setItem(STORAGE_KEYS.GROCERY_ITEMS, JSON.stringify(items));
+      const key = getStorageKey(STORAGE_KEYS.GROCERY_ITEMS, userId);
+      localStorage.setItem(key, JSON.stringify(items));
     } catch (error) {
       console.error('Error saving grocery items:', error);
     }
   },
 
   // Shopping List
-  getShoppingList: (): ShoppingListItem[] => {
+  getShoppingList: (userId?: string): ShoppingListItem[] => {
     try {
-      const items = localStorage.getItem(STORAGE_KEYS.SHOPPING_LIST);
+      const key = getStorageKey(STORAGE_KEYS.SHOPPING_LIST, userId);
+      const items = localStorage.getItem(key);
       if (!items) return [];
       return JSON.parse(items).map((item: any) => ({
         ...item,
@@ -46,9 +53,10 @@ export const storage = {
     }
   },
 
-  saveShoppingList: (items: ShoppingListItem[]): void => {
+  saveShoppingList: (items: ShoppingListItem[], userId?: string): void => {
     try {
-      localStorage.setItem(STORAGE_KEYS.SHOPPING_LIST, JSON.stringify(items));
+      const key = getStorageKey(STORAGE_KEYS.SHOPPING_LIST, userId);
+      localStorage.setItem(key, JSON.stringify(items));
     } catch (error) {
       console.error('Error saving shopping list:', error);
     }

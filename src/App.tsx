@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { GroceryItem, ShoppingListItem } from './types';
 import { storage } from './utils/storage';
 import { NotificationService } from './services/notifications';
+import AuthService, { User } from './services/auth';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import FridgeInventory from './components/FridgeInventory';
+// The following imports are commented out due to missing modules or type declarations.
 import RecipeSuggestions from './components/RecipeSuggestions';
 import ShoppingList from './components/ShoppingList';
 import AddItemModal from './components/AddItemModal';
@@ -20,11 +22,41 @@ function App() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Load data on component mount
+  // Initialize authentication and load user data
   useEffect(() => {
-    setGroceryItems(storage.getGroceryItems());
-    setShoppingList(storage.getShoppingList());
+    const authService = AuthService.getInstance();
+    const authState = authService.getState();
+    
+    if (authState.isAuthenticated && authState.user) {
+      setUser(authState.user);
+      // Load user-specific data
+      setGroceryItems(storage.getGroceryItems(authState.user.id));
+      setShoppingList(storage.getShoppingList(authState.user.id));
+    } else {
+      // Load demo data for non-authenticated users
+      setGroceryItems(storage.getGroceryItems());
+      setShoppingList(storage.getShoppingList());
+    }
+    
+    setIsLoading(false);
+
+    // Subscribe to auth state changes
+    const unsubscribe = authService.subscribe((newState) => {
+      if (newState.isAuthenticated && newState.user) {
+        setUser(newState.user);
+        setGroceryItems(storage.getGroceryItems(newState.user.id));
+        setShoppingList(storage.getShoppingList(newState.user.id));
+      } else {
+        setUser(null);
+        setGroceryItems(storage.getGroceryItems());
+        setShoppingList(storage.getShoppingList());
+      }
+    });
+
+    return unsubscribe;
   }, []);
 
   // Check for notifications when data changes
@@ -40,12 +72,12 @@ function App() {
 
   // Save data whenever it changes
   useEffect(() => {
-    storage.saveGroceryItems(groceryItems);
-  }, [groceryItems]);
+    storage.saveGroceryItems(groceryItems, user?.id);
+  }, [groceryItems, user?.id]);
 
   useEffect(() => {
-    storage.saveShoppingList(shoppingList);
-  }, [shoppingList]);
+    storage.saveShoppingList(shoppingList, user?.id);
+  }, [shoppingList, user?.id]);
 
   const addGroceryItem = (item: Omit<GroceryItem, 'id'>) => {
     setGroceryItems(prev => {
@@ -126,9 +158,27 @@ function App() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
+            <span className="text-primary-600 font-bold text-2xl">F</span>
+          </div>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">Loading FridgeMind...</h2>
+          <p className="text-gray-600">Setting up your smart fridge assistant</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 transition-all duration-300">
-      <Header onSettingsClick={() => setShowSettings(true)} />
+      <Header 
+        onSettingsClick={() => setShowSettings(true)} 
+        user={user}
+        onUserChange={setUser}
+      />
       <main className="pb-20 w-full animate-fadeIn">
         {renderActiveTab()}
       </main>

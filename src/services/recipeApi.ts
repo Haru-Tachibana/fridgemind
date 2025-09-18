@@ -36,14 +36,27 @@ export const searchRecipes = async (params: RecipeSearchParams): Promise<Recipe[
     }
 
     const data = await response.json();
-    return data.map(transformRecipe);
+    return Promise.all(data.map(transformRecipe));
   } catch (error) {
     console.error('Error fetching recipes:', error);
     return getMockRecipes(params.ingredients);
   }
 };
 
-const transformRecipe = (apiRecipe: any): Recipe => {
+const transformRecipe = async (apiRecipe: any): Promise<Recipe> => {
+  // Try to get detailed instructions
+  let instructions: string[] = [];
+  try {
+    instructions = await getRecipeInstructions(apiRecipe.id.toString());
+  } catch (error) {
+    console.log('Could not fetch detailed instructions, using basic ones');
+    instructions = [
+      'Prepare all ingredients as needed',
+      'Follow the cooking method for this recipe',
+      'Season to taste and serve hot'
+    ];
+  }
+
   return {
     id: apiRecipe.id.toString(),
     name: apiRecipe.title,
@@ -52,7 +65,7 @@ const transformRecipe = (apiRecipe: any): Recipe => {
       ...apiRecipe.usedIngredients.map((ing: any) => ing.name),
       ...apiRecipe.missedIngredients.map((ing: any) => ing.name)
     ],
-    instructions: [], // Would need another API call to get detailed instructions
+    instructions: instructions,
     prepTime: 15, // Default values since not provided in basic search
     cookTime: 30,
     servings: 4,
@@ -70,11 +83,13 @@ const getMockRecipes = (ingredients: string[]): Recipe[] => {
       description: 'Quick and healthy chicken stir fry with vegetables',
       ingredients: ['chicken', 'broccoli', 'carrot', 'soy sauce', 'garlic'],
       instructions: [
-        'Cut chicken into bite-sized pieces',
-        'Heat oil in a large pan',
-        'Cook chicken until golden brown',
-        'Add vegetables and stir fry for 5 minutes',
-        'Add soy sauce and garlic, cook for 2 more minutes'
+        'Cut chicken into bite-sized pieces and season with salt and pepper',
+        'Heat 2 tablespoons of oil in a large wok or pan over high heat',
+        'Add chicken and cook for 4-5 minutes until golden brown and cooked through',
+        'Add broccoli and carrots, stir fry for 3-4 minutes until vegetables are tender-crisp',
+        'Add minced garlic and cook for 30 seconds until fragrant',
+        'Pour in soy sauce and toss everything together for 1-2 minutes',
+        'Serve immediately over rice or noodles'
       ],
       prepTime: 15,
       cookTime: 10,
@@ -88,12 +103,14 @@ const getMockRecipes = (ingredients: string[]): Recipe[] => {
       description: 'Warm and comforting vegetable soup',
       ingredients: ['carrot', 'broccoli', 'onion', 'vegetable broth', 'salt', 'pepper'],
       instructions: [
-        'Chop all vegetables',
-        'Heat oil in a large pot',
-        'Sauté onions until translucent',
-        'Add vegetables and broth',
-        'Simmer for 20 minutes',
-        'Season with salt and pepper'
+        'Wash and chop all vegetables into bite-sized pieces',
+        'Heat 1 tablespoon of olive oil in a large pot over medium heat',
+        'Add diced onions and cook for 3-4 minutes until translucent',
+        'Add carrots and cook for 2-3 minutes, then add broccoli',
+        'Pour in vegetable broth and bring to a boil',
+        'Reduce heat and simmer for 15-20 minutes until vegetables are tender',
+        'Season with salt, pepper, and herbs to taste',
+        'Serve hot with crusty bread'
       ],
       prepTime: 10,
       cookTime: 25,
