@@ -1,7 +1,7 @@
 import { Recipe } from '../types';
 
 // Spoonacular API - Free tier allows 150 requests per day
-const API_KEY = '035af799878c4e4cbc9532625f7a9b38'; // You'll need to get this from https://spoonacular.com/food-api
+const API_KEY = process.env.REACT_APP_SPOONACULAR_API_KEY || '035af799878c4e4cbc9532625f7a9b38';
 const BASE_URL = 'https://api.spoonacular.com/recipes';
 
 export interface RecipeSearchParams {
@@ -14,8 +14,8 @@ export interface RecipeSearchParams {
 
 export const searchRecipes = async (params: RecipeSearchParams): Promise<Recipe[]> => {
   try {
-    // For demo purposes, we'll use mock data if no API key is provided
-    if (API_KEY === '035af799878c4e4cbc9532625f7a9b38') {
+    // Use mock data if no API key is provided
+    if (!API_KEY || API_KEY === 'your-spoonacular-api-key') {
       return getMockRecipes(params.ingredients);
     }
 
@@ -170,7 +170,7 @@ const getMockRecipes = (ingredients: string[]): Recipe[] => {
 
 export const getRecipeInstructions = async (recipeId: string): Promise<string[]> => {
   try {
-    if (API_KEY === '035af799878c4e4cbc9532625f7a9b38') {
+    if (!API_KEY || API_KEY === 'your-spoonacular-api-key') {
       return ['Detailed instructions would be available with a real API key'];
     }
 

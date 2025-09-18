@@ -129,7 +129,7 @@ const Settings: React.FC<SettingsProps> = ({ onClose, onLoadDemoData }) => {
                       if (onLoadDemoData) {
                         onLoadDemoData();
                       }
-                      window.location.reload();
+                      onClose();
                     }
                   }}
                   className="w-full px-4 py-2 bg-primary-100 text-primary-700 rounded-lg hover:bg-primary-200 transition-colors"

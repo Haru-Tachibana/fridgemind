@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { GroceryItem, Recipe } from '../types';
 import { ChefHat, Search, Clock, Users } from 'lucide-react';
 import { searchRecipes, RecipeSearchParams } from '../services/recipeApi';
@@ -13,16 +13,7 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // Fetch recipes when items change
-  useEffect(() => {
-    if (items.length > 0) {
-      fetchRecipes();
-    } else {
-      setRecipes([]);
-    }
-  }, [items]);
-
-  const fetchRecipes = async () => {
+  const fetchRecipes = useCallback(async () => {
     setLoading(true);
     try {
       const ingredients = items.map(item => item.name);
@@ -39,7 +30,16 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [items, selectedFilter]);
+
+  // Fetch recipes when items change
+  useEffect(() => {
+    if (items.length > 0) {
+      fetchRecipes();
+    } else {
+      setRecipes([]);
+    }
+  }, [fetchRecipes]);
 
   // Mock recipe data - fallback when API is not available (currently unused)
   // const mockRecipes: Recipe[] = [
