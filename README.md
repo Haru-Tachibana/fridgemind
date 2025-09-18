@@ -1,46 +1,151 @@
-# Getting Started with Create React App
+# FridgeMind 🧊
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A minimalistic web app that helps users track groceries, reduce food waste, and get recipe suggestions.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+### 🛒 Grocery Management
+- **Manual Input**: Simple form to add items with name, category, quantity, and expiry date
+- **Voice Input**: Press and hold the microphone button to speak groceries (e.g., "2 cartons of milk, 1 broccoli")
+- **Smart Categorization**: Automatically categorizes items and estimates expiry dates
+- **Visual Organization**: Clean, sortable list with category icons and color coding
 
-### `npm start`
+### 🍳 Recipe Suggestions
+- **AI-Powered Recommendations**: Get recipe suggestions based on available ingredients
+- **Missing Ingredients**: Shows what additional items you need for each recipe
+- **Smart Filtering**: Filter by meal type, dietary preferences, and cooking time
+- **Availability Status**: Visual indicators for recipes you can make right now
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### 📝 Shopping List
+- **Must-Have Items**: Mark essential items that auto-add when stock is low
+- **Export Functionality**: Export your shopping list as text or email
+- **Category Organization**: Items organized by food categories with visual icons
+- **Smart Notifications**: Get notified when must-have items are missing
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### 🔔 Smart Notifications
+- **Expiry Warnings**: Get notified when items are expiring within 3 days (configurable)
+- **Low Stock Alerts**: Notifications when items are running low
+- **Must-Have Reminders**: Alerts when essential items are missing from your fridge
+- **Customizable Settings**: Adjust notification preferences in settings
 
-### `npm test`
+## Design
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Minimalist UI**: Clean, flat design with pastel accent colors
+- **Mobile-First**: Responsive design optimized for mobile devices
+- **Intuitive Navigation**: Simple 3-tab interface (Fridge, Recipes, Shopping)
+- **Accessibility**: High contrast colors and clear typography
 
-### `npm run build`
+## Technology Stack
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- **Frontend**: React 18 with TypeScript
+- **Styling**: Tailwind CSS for minimalistic design
+- **State Management**: React hooks and local storage
+- **Icons**: Lucide React for consistent iconography
+- **Date Handling**: date-fns for reliable date operations
+- **Notifications**: Web Push API for smart alerts
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Getting Started
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Prerequisites
+- Node.js 16+ 
+- npm or yarn
 
-### `npm run eject`
+### Installation
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd fridgemind
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+2. Install dependencies:
+```bash
+npm install
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+3. Start the development server:
+```bash
+npm start
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-## Learn More
+### Building for Production
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+npm run build
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+This builds the app for production to the `build` folder.
+
+## Usage
+
+### Adding Groceries
+1. Tap the floating "+" button
+2. Enter item name manually or use voice input
+3. Select category and set quantity/expiry date
+4. Tap "Add Item"
+
+### Managing Your Fridge
+- **Sort**: By expiry date, category, or name
+- **Filter**: By food category
+- **Remove**: Tap the "-" button and confirm
+- **Track**: Visual indicators for expiring items
+
+### Getting Recipe Ideas
+- View suggested recipes based on your ingredients
+- Filter by meal type or dietary preferences
+- See which recipes you can make right now
+- Check what additional ingredients you need
+
+### Shopping List Management
+- Add items manually or from low-stock alerts
+- Mark items as "must-have" for auto-adding
+- Export your list for shopping
+- Organize by category for efficient shopping
+
+## Data Storage
+
+FridgeMind stores all data locally in your browser using localStorage. This means:
+- ✅ Your data stays private and secure
+- ✅ Works offline
+- ✅ No account required
+- ⚠️ Data is tied to your specific browser/device
+
+### Data Export/Import
+- Export your data as JSON from Settings
+- Clear all data if needed
+- Backup your data regularly for safety
+
+## Browser Support
+
+- Chrome 60+
+- Firefox 55+
+- Safari 12+
+- Edge 79+
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details
+
+## Roadmap
+
+- [ ] Receipt photo upload with OCR
+- [ ] Cloud sync across devices
+- [ ] Advanced recipe search
+- [ ] Meal planning features
+- [ ] Barcode scanning
+- [ ] Social sharing
+- [ ] Multi-language support
+
+---
+
+Built with ❤️ for reducing food waste and making meal planning easier.
