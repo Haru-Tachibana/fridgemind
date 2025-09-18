@@ -57,10 +57,10 @@ export const CATEGORY_ICONS: Record<GroceryCategory, React.ComponentType<any>> =
 };
 
 export const CATEGORY_COLORS: Record<GroceryCategory, string> = {
-  meat: 'bg-accent-100 text-accent-800',
+  meat: 'bg-amaranth-100 text-amaranth-800',
   vegetables: 'bg-primary-100 text-primary-800',
-  dairy: 'bg-blue-100 text-blue-800',
-  fruits: 'bg-secondary-100 text-secondary-800',
-  grains: 'bg-amber-100 text-amber-800',
+  dairy: 'bg-secondary-100 text-secondary-800',
+  fruits: 'bg-mindaro-100 text-mindaro-800',
+  grains: 'bg-cream-100 text-cream-800',
   other: 'bg-gray-100 text-gray-800'
 };

@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { GroceryItem, ShoppingListItem, GroceryCategory } from '../types';
 import { categorizeItem, estimateExpiryDate } from '../utils/helpers';
-import { parseVoiceInput } from '../utils/voiceParser';
+import { parseVoiceInput, ParsedItem } from '../utils/voiceParser';
 import { Mic, MicOff, Beef, Carrot, Milk, Apple, Wheat, Package } from 'lucide-react';
+import VoiceConfirmationModal from './VoiceConfirmationModal';
 
 type TabType = 'fridge' | 'recipes' | 'shopping';
 
@@ -27,6 +28,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [isMustHave, setIsMustHave] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [voiceAnimation, setVoiceAnimation] = useState(false);
+  const [showVoiceConfirmation, setShowVoiceConfirmation] = useState(false);
+  const [voiceItems, setVoiceItems] = useState<ParsedItem[]>([]);
 
   const categories: { value: GroceryCategory; label: string; icon: React.ComponentType<any> }[] = [
     { value: 'meat', label: 'Meat', icon: Beef },
@@ -91,30 +94,10 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
       const parsedItems = parseVoiceInput(transcript);
       
       if (parsedItems.length > 0) {
-        // If multiple items, add them all
+        // If multiple items, show confirmation modal
         if (parsedItems.length > 1) {
-          parsedItems.forEach((item, index) => {
-            setTimeout(() => {
-              if (activeTab === 'fridge') {
-                onAddGroceryItem({
-                  name: item.name,
-                  category: item.category,
-                  expiryDate: estimateExpiryDate(item.name, item.category),
-                  addedDate: new Date(),
-                  quantity: item.quantity,
-                  unit: item.unit,
-                });
-              } else {
-                onAddShoppingItem({
-                  name: item.name,
-                  category: item.category,
-                  isMustHave: false,
-                  autoAdd: false,
-                });
-              }
-            }, index * 100); // Stagger the additions
-          });
-          onClose();
+          setVoiceItems(parsedItems);
+          setShowVoiceConfirmation(true);
         } else {
           // Single item - populate form
           const item = parsedItems[0];
@@ -144,6 +127,46 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     };
 
     recognition.start();
+  };
+
+  const handleVoiceConfirm = (items: ParsedItem[]) => {
+    items.forEach((item, index) => {
+      setTimeout(() => {
+        if (activeTab === 'fridge') {
+          onAddGroceryItem({
+            name: item.name,
+            category: item.category,
+            expiryDate: estimateExpiryDate(item.name, item.category),
+            addedDate: new Date(),
+            quantity: item.quantity,
+            unit: item.unit,
+          });
+        } else {
+          onAddShoppingItem({
+            name: item.name,
+            category: item.category,
+            isMustHave: false,
+            autoAdd: false,
+          });
+        }
+      }, index * 100); // Stagger the additions
+    });
+    setShowVoiceConfirmation(false);
+    onClose();
+  };
+
+  const handleVoiceCancel = () => {
+    setShowVoiceConfirmation(false);
+    setVoiceItems([]);
+  };
+
+  const handleEditItem = (index: number, item: ParsedItem) => {
+    // For now, just populate the form with the selected item
+    setItemName(item.name);
+    setCategory(item.category);
+    setQuantity(item.quantity);
+    setUnit(item.unit);
+    setShowVoiceConfirmation(false);
   };
 
   return (
@@ -313,6 +336,17 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
           </form>
         </div>
       </div>
+
+      {/* Voice Confirmation Modal */}
+      {showVoiceConfirmation && (
+        <VoiceConfirmationModal
+          items={voiceItems}
+          onConfirm={handleVoiceConfirm}
+          onCancel={handleVoiceCancel}
+          onEditItem={handleEditItem}
+          activeTab={activeTab}
+        />
+      )}
     </div>
   );
 };

@@ -82,6 +82,19 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
             <Download className="w-4 h-4" />
             <span>Export</span>
           </button>
+          {items.length > 0 && (
+            <button
+              onClick={() => {
+                if (window.confirm('Are you sure you want to delete all items from your shopping list?')) {
+                  items.forEach(item => onRemoveItem(item.id));
+                }
+              }}
+              className="px-3 py-1 bg-accent-500 text-white rounded-lg text-sm hover:bg-accent-600 transition-colors flex items-center space-x-1"
+            >
+              <X className="w-4 h-4" />
+              <span>Delete All</span>
+            </button>
+          )}
           <button
             onClick={() => setShowAddForm(!showAddForm)}
             className="px-3 py-1 bg-primary-500 text-white rounded-lg text-sm hover:bg-primary-600 transition-colors flex items-center space-x-1"
