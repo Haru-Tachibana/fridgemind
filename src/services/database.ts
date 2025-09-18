@@ -1,8 +1,23 @@
-import { supabase } from '../config/supabase';
+import { supabase, isSupabaseConfigured } from '../config/supabase';
 import { GroceryItem, ShoppingListItem } from '../types';
+
+// Fallback to localStorage when Supabase is not configured
+const useLocalStorage = !isSupabaseConfigured();
 
 // User management
 export const createUser = async (email: string, name: string) => {
+  if (useLocalStorage) {
+    // Fallback to localStorage
+    const user = {
+      id: Math.random().toString(36).substr(2, 9),
+      email,
+      name,
+      created_at: new Date().toISOString(),
+    };
+    localStorage.setItem('fridgemind_user', JSON.stringify(user));
+    return user;
+  }
+
   const { data, error } = await supabase
     .from('users')
     .insert([
@@ -20,6 +35,18 @@ export const createUser = async (email: string, name: string) => {
 };
 
 export const getUserByEmail = async (email: string) => {
+  if (useLocalStorage) {
+    // Fallback to localStorage
+    const userData = localStorage.getItem('fridgemind_user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      if (user.email === email) {
+        return user;
+      }
+    }
+    return null;
+  }
+
   const { data, error } = await supabase
     .from('users')
     .select('*')
@@ -32,6 +59,18 @@ export const getUserByEmail = async (email: string) => {
 
 // Grocery items management
 export const getGroceryItems = async (userId: string): Promise<GroceryItem[]> => {
+  if (useLocalStorage) {
+    // Fallback to localStorage
+    const key = `fridgemind_grocery_items_${userId}`;
+    const items = localStorage.getItem(key);
+    if (!items) return [];
+    return JSON.parse(items).map((item: any) => ({
+      ...item,
+      expiryDate: new Date(item.expiryDate),
+      addedDate: new Date(item.addedDate),
+    }));
+  }
+
   const { data, error } = await supabase
     .from('grocery_items')
     .select('*')
@@ -52,6 +91,13 @@ export const getGroceryItems = async (userId: string): Promise<GroceryItem[]> =>
 };
 
 export const saveGroceryItems = async (userId: string, items: GroceryItem[]) => {
+  if (useLocalStorage) {
+    // Fallback to localStorage
+    const key = `fridgemind_grocery_items_${userId}`;
+    localStorage.setItem(key, JSON.stringify(items));
+    return;
+  }
+
   const itemsToSave = items.map(item => ({
     id: item.id,
     user_id: userId,

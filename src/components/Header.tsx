@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Settings, User, LogIn } from 'lucide-react';
 import AuthModal from './AuthModal';
 import UserProfile from './UserProfile';
-import AuthService, { User as UserType } from '../services/auth';
+import SimpleAuthService, { User as UserType } from '../services/simpleAuth';
 
 interface HeaderProps {
   onSettingsClick: () => void;

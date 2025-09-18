@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { GroceryItem, ShoppingListItem } from './types';
 import { storage } from './utils/storage';
 import { NotificationService } from './services/notifications';
-import AuthService, { User } from './services/auth';
+import SimpleAuthService, { User } from './services/simpleAuth';
 import Header from './components/Header';
 import Navigation from './components/Navigation';
 import FridgeInventory from './components/FridgeInventory';
@@ -28,7 +28,7 @@ function App() {
   // Initialize authentication and load user data
   useEffect(() => {
     const loadData = async () => {
-      const authService = AuthService.getInstance();
+      const authService = SimpleAuthService.getInstance();
       const authState = authService.getState();
       
       if (authState.isAuthenticated && authState.user) {
@@ -56,7 +56,7 @@ function App() {
     loadData();
 
     // Subscribe to auth state changes
-    const authService = AuthService.getInstance();
+    const authService = SimpleAuthService.getInstance();
     const unsubscribe = authService.subscribe(async (newState) => {
       if (newState.isAuthenticated && newState.user) {
         setUser(newState.user);

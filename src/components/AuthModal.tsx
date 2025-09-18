@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Mail, Lock, User as UserIcon, Eye, EyeOff } from 'lucide-react';
-import AuthService, { User } from '../services/auth';
+import SimpleAuthService, { User } from '../services/simpleAuth';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -16,7 +16,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onSuccess }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const authService = AuthService.getInstance();
+  const authService = SimpleAuthService.getInstance();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -1,8 +1,13 @@
 import { createClient } from '@supabase/supabase-js';
 
 // These will be set as environment variables
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'your-anon-key';
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY || 'placeholder-key';
+
+// Check if we have valid Supabase credentials
+export const isSupabaseConfigured = () => {
+  return supabaseUrl !== 'https://placeholder.supabase.co' && supabaseKey !== 'placeholder-key';
+};
 
 export const supabase = createClient(supabaseUrl, supabaseKey);
 
