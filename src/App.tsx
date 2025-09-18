@@ -9,6 +9,7 @@ import RecipeSuggestions from './components/RecipeSuggestions';
 import ShoppingList from './components/ShoppingList';
 import AddItemModal from './components/AddItemModal';
 import Settings from './components/Settings';
+import Toast from './components/Toast';
 
 type TabType = 'fridge' | 'recipes' | 'shopping';
 
@@ -18,6 +19,7 @@ function App() {
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   // Load data on component mount
   useEffect(() => {
@@ -51,6 +53,7 @@ function App() {
       id: Math.random().toString(36).substr(2, 9),
     };
     setGroceryItems(prev => [...prev, newItem]);
+    setToast({ message: `${item.name} added to fridge!`, type: 'success' });
   };
 
   const removeGroceryItem = (id: string) => {
@@ -63,6 +66,7 @@ function App() {
       id: Math.random().toString(36).substr(2, 9),
     };
     setShoppingList(prev => [...prev, newItem]);
+    setToast({ message: `${item.name} added to shopping list!`, type: 'success' });
   };
 
   const removeShoppingListItem = (id: string) => {
@@ -103,9 +107,9 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 transition-all duration-300">
       <Header onSettingsClick={() => setShowSettings(true)} />
-      <main className="pb-20 w-full">
+      <main className="pb-20 w-full animate-fadeIn">
         {renderActiveTab()}
       </main>
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
@@ -113,9 +117,9 @@ function App() {
       {/* Floating Add Button */}
       <button
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-24 right-6 w-14 h-14 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 transition-colors"
+        className="fixed bottom-24 right-6 w-14 h-14 bg-primary-500 hover:bg-primary-600 text-white rounded-full shadow-lg flex items-center justify-center z-40 transition-all duration-300 hover:scale-110 hover:shadow-xl animate-bounceIn"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-6 h-6 transition-transform duration-200 hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
         </svg>
       </button>
@@ -138,6 +142,15 @@ function App() {
             setGroceryItems(storage.getGroceryItems());
             setShoppingList(storage.getShoppingList());
           }}
+        />
+      )}
+
+      {/* Toast Notifications */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
         />
       )}
     </div>

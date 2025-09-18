@@ -147,8 +147,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50">
-      <div className="bg-white rounded-t-2xl w-full max-w-2xl mx-auto max-h-[80vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50 animate-fadeIn">
+      <div className="bg-white rounded-t-2xl w-full max-w-2xl mx-auto max-h-[80vh] overflow-y-auto animate-slideUp">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">

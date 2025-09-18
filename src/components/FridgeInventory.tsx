@@ -85,14 +85,15 @@ const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem }
 
       {/* Items List */}
       <div className="space-y-3">
-        {sortedAndFilteredItems.map((item) => {
+        {sortedAndFilteredItems.map((item, index) => {
           const expiryStatus = getExpiryStatus(item.expiryDate);
           const daysUntilExpiry = getDaysUntilExpiry(item.expiryDate);
           
           return (
             <div
               key={item.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-all duration-300 animate-slideUp"
+              style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">

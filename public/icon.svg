@@ -1,0 +1,36 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Refrigerator body -->
+  <rect x="12" y="8" width="40" height="48" rx="4" fill="#22c55e" stroke="#16a34a" stroke-width="2"/>
+  
+  <!-- Refrigerator door -->
+  <rect x="14" y="10" width="36" height="44" rx="2" fill="#dcfce7" stroke="#16a34a" stroke-width="1"/>
+  
+  <!-- Handle -->
+  <rect x="46" y="24" width="4" height="12" rx="2" fill="#16a34a"/>
+  
+  <!-- Shelves -->
+  <line x1="16" y1="22" x2="48" y2="22" stroke="#16a34a" stroke-width="1"/>
+  <line x1="16" y1="36" x2="48" y2="36" stroke="#16a34a" stroke-width="1"/>
+  
+  <!-- Food items -->
+  <!-- Apple -->
+  <circle cx="24" cy="18" r="3" fill="#ef4444"/>
+  <path d="M24 15 L25 13 L23 13 Z" fill="#16a34a"/>
+  
+  <!-- Milk carton -->
+  <rect x="32" y="16" width="6" height="8" rx="1" fill="#fbbf24"/>
+  <rect x="33" y="17" width="4" height="6" fill="#f59e0b"/>
+  
+  <!-- Carrot -->
+  <path d="M20 32 L20 38 L18 40 L22 40 Z" fill="#f59e0b"/>
+  <path d="M20 32 L18 30 L22 30 Z" fill="#16a34a"/>
+  
+  <!-- Bread -->
+  <rect x="30" y="30" width="8" height="4" rx="1" fill="#92400e"/>
+  <rect x="31" y="31" width="6" height="2" fill="#a16207"/>
+  
+  <!-- Sparkle effect -->
+  <circle cx="52" cy="12" r="2" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="8" cy="20" r="1.5" fill="#fbbf24" opacity="0.6"/>
+  <circle cx="56" cy="32" r="1" fill="#fbbf24" opacity="0.7"/>
+</svg>

@@ -1,4 +1,5 @@
 import { GroceryCategory } from '../types';
+import { findFoodItems, FOOD_DATABASE } from '../data/foodDatabase';
 import { categorizeItem } from './helpers';
 
 export interface ParsedItem {
@@ -15,7 +16,9 @@ export const parseVoiceInput = (transcript: string): ParsedItem[] => {
   const quantityMap: Record<string, number> = {
     'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
     'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
-    'a': 1, 'an': 1, 'some': 1, 'few': 2, 'several': 3
+    'eleven': 11, 'twelve': 12, 'thirteen': 13, 'fourteen': 14, 'fifteen': 15,
+    'sixteen': 16, 'seventeen': 17, 'eighteen': 18, 'nineteen': 19, 'twenty': 20,
+    'a': 1, 'an': 1, 'some': 1, 'few': 2, 'several': 3, 'about': 1
   };
 
   // Common units
@@ -31,7 +34,17 @@ export const parseVoiceInput = (transcript: string): ParsedItem[] => {
     'kilogram': 'kg', 'kilograms': 'kg', 'kg': 'kg',
     'liter': 'liter', 'liters': 'liter', 'l': 'liter',
     'cup': 'cup', 'cups': 'cup',
-    'dozen': 'dozen', 'dozens': 'dozen'
+    'dozen': 'dozen', 'dozens': 'dozen',
+    'bunch': 'bunch', 'bunches': 'bunch',
+    'slice': 'slice', 'slices': 'slice',
+    'clove': 'clove', 'cloves': 'clove',
+    'ear': 'ear', 'ears': 'ear',
+    'fillet': 'fillet', 'fillets': 'fillet',
+    'package': 'package', 'packages': 'package',
+    'container': 'container', 'containers': 'container',
+    'jar': 'jar', 'jars': 'jar',
+    'stick': 'stick', 'sticks': 'stick',
+    'loaf': 'loaf', 'loaves': 'loaf'
   };
 
   // Split by common separators
@@ -74,23 +87,55 @@ export const parseVoiceInput = (transcript: string): ParsedItem[] => {
       }
     }
 
-    // Extract item name (remove quantity and unit words)
-    const nameWords = words.filter((word, index) => {
-      if (index === quantityIndex || index === unitIndex) return false;
-      if (['of', 'the', 'a', 'an', 'some'].includes(word)) return false;
-      return true;
-    });
-
-    if (nameWords.length > 0) {
-      const name = nameWords.join(' ').trim();
-      const category = categorizeItem(name);
-      
-      items.push({
-        name: name,
-        quantity: quantity,
-        unit: unit,
-        category: category
+    // Try to find food items in the sentence
+    const foundFoods = findFoodItems(sentence);
+    
+    if (foundFoods.length > 0) {
+      // Use found food items
+      for (const food of foundFoods) {
+        items.push({
+          name: food.name,
+          quantity: quantity,
+          unit: unit,
+          category: food.category
+        });
+      }
+    } else {
+      // Fallback to original logic
+      const nameWords = words.filter((word, index) => {
+        if (index === quantityIndex || index === unitIndex) return false;
+        if (['of', 'the', 'a', 'an', 'some', 'about'].includes(word)) return false;
+        return true;
       });
+
+      if (nameWords.length > 0) {
+        const name = nameWords.join(' ').trim();
+        
+        // Try to find a partial match in the food database
+        const partialMatch = FOOD_DATABASE.find(food => 
+          food.name.includes(name) || 
+          food.aliases.some(alias => alias.includes(name)) ||
+          name.includes(food.name)
+        );
+        
+        if (partialMatch) {
+          items.push({
+            name: partialMatch.name,
+            quantity: quantity,
+            unit: unit,
+            category: partialMatch.category
+          });
+        } else {
+          // Use original categorization as fallback
+          const category = categorizeItem(name);
+          items.push({
+            name: name,
+            quantity: quantity,
+            unit: unit,
+            category: category
+          });
+        }
+      }
     }
   }
 
