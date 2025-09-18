@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { GroceryItem, CATEGORY_ICONS, CATEGORY_COLORS } from '../types';
 import { formatDate, getDaysUntilExpiry, getExpiryStatus, getExpiryStatusColor } from '../utils/helpers';
-import { Refrigerator } from 'lucide-react';
+import { Refrigerator, Plus, Minus, Trash2 } from 'lucide-react';
 
 interface FridgeInventoryProps {
   items: GroceryItem[];
   onRemoveItem: (id: string) => void;
+  onUpdateQuantity: (id: string, quantity: number) => void;
 }
 
-const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem }) => {
+const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem, onUpdateQuantity }) => {
   const [sortBy, setSortBy] = useState<'expiry' | 'category' | 'name'>('expiry');
   const [filterCategory, setFilterCategory] = useState<string>('all');
 
@@ -29,11 +30,6 @@ const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem }
       }
     });
 
-  const handleRemoveItem = (id: string) => {
-    if (window.confirm('Are you sure you want to remove this item?')) {
-      onRemoveItem(id);
-    }
-  };
 
   if (items.length === 0) {
     return (
@@ -128,14 +124,36 @@ const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem }
                   </div>
                 </div>
                 
-                <button
-                  onClick={() => handleRemoveItem(item.id)}
-                  className="ml-4 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
+                <div className="flex items-center space-x-2">
+                  {/* Quantity Controls */}
+                  <div className="flex items-center space-x-1 bg-gray-100 rounded-lg p-1">
+                    <button
+                      onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                      className="p-1 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded transition-colors"
+                      disabled={item.quantity <= 1}
+                    >
+                      <Minus className="w-4 h-4" />
+                    </button>
+                    <span className="px-2 py-1 text-sm font-medium text-gray-700 min-w-[2rem] text-center">
+                      {item.quantity}
+                    </span>
+                    <button
+                      onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                      className="p-1 text-gray-600 hover:text-gray-800 hover:bg-gray-200 rounded transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  
+                  {/* Remove Button */}
+                  <button
+                    onClick={() => onRemoveItem(item.id)}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                    title="Remove all"
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
           );

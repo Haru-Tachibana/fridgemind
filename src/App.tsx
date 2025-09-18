@@ -82,10 +82,12 @@ function App() {
   const addGroceryItem = (item: Omit<GroceryItem, 'id'>) => {
     setGroceryItems(prev => {
       // Check if there's an existing item with the same name and expiry date
-      const existingItemIndex = prev.findIndex(existingItem => 
-        existingItem.name.toLowerCase() === item.name.toLowerCase() &&
-        existingItem.expiryDate.getTime() === item.expiryDate.getTime()
-      );
+      // Use a more flexible date comparison (same day, not exact time)
+      const existingItemIndex = prev.findIndex(existingItem => {
+        const sameName = existingItem.name.toLowerCase() === item.name.toLowerCase();
+        const sameExpiryDate = existingItem.expiryDate.toDateString() === item.expiryDate.toDateString();
+        return sameName && sameExpiryDate;
+      });
       
       if (existingItemIndex !== -1) {
         // Merge with existing item by adding quantities
@@ -110,6 +112,19 @@ function App() {
 
   const removeGroceryItem = (id: string) => {
     setGroceryItems(prev => prev.filter(item => item.id !== id));
+  };
+
+  const updateGroceryItemQuantity = (id: string, newQuantity: number) => {
+    if (newQuantity <= 0) {
+      removeGroceryItem(id);
+      return;
+    }
+    
+    setGroceryItems(prev => 
+      prev.map(item => 
+        item.id === id ? { ...item, quantity: newQuantity } : item
+      )
+    );
   };
 
   const addShoppingListItem = (item: Omit<ShoppingListItem, 'id'>) => {
@@ -140,6 +155,7 @@ function App() {
           <FridgeInventory
             items={groceryItems}
             onRemoveItem={removeGroceryItem}
+            onUpdateQuantity={updateGroceryItemQuantity}
           />
         );
       case 'recipes':

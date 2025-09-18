@@ -46,10 +46,10 @@ const Header: React.FC<HeaderProps> = ({ onSettingsClick, user, onUserChange }) 
               ) : (
                 <button
                   onClick={() => setShowAuthModal(true)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-100 transition-colors"
-                  title="Sign In"
+                  className="px-3 py-2 text-sm text-primary-600 hover:text-primary-700 bg-primary-50 hover:bg-primary-100 rounded-lg transition-colors flex items-center space-x-2"
                 >
-                  <LogIn className="w-6 h-6" />
+                  <LogIn className="w-4 h-4" />
+                  <span>Sign In</span>
                 </button>
               )}
               <button
