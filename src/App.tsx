@@ -48,12 +48,32 @@ function App() {
   }, [shoppingList]);
 
   const addGroceryItem = (item: Omit<GroceryItem, 'id'>) => {
-    const newItem: GroceryItem = {
-      ...item,
-      id: Math.random().toString(36).substr(2, 9),
-    };
-    setGroceryItems(prev => [...prev, newItem]);
-    setToast({ message: `${item.name} added to fridge!`, type: 'success' });
+    setGroceryItems(prev => {
+      // Check if there's an existing item with the same name and expiry date
+      const existingItemIndex = prev.findIndex(existingItem => 
+        existingItem.name.toLowerCase() === item.name.toLowerCase() &&
+        existingItem.expiryDate.getTime() === item.expiryDate.getTime()
+      );
+      
+      if (existingItemIndex !== -1) {
+        // Merge with existing item by adding quantities
+        const updatedItems = [...prev];
+        updatedItems[existingItemIndex] = {
+          ...updatedItems[existingItemIndex],
+          quantity: updatedItems[existingItemIndex].quantity + item.quantity
+        };
+        setToast({ message: `${item.name} quantity updated to ${updatedItems[existingItemIndex].quantity}!`, type: 'success' });
+        return updatedItems;
+      } else {
+        // Add new item
+        const newItem: GroceryItem = {
+          ...item,
+          id: Math.random().toString(36).substr(2, 9),
+        };
+        setToast({ message: `${item.name} added to fridge!`, type: 'success' });
+        return [...prev, newItem];
+      }
+    });
   };
 
   const removeGroceryItem = (id: string) => {

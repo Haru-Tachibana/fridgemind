@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { GroceryItem, Recipe } from '../types';
 import { ChefHat, Search, Clock, Users } from 'lucide-react';
 import { searchRecipes, RecipeSearchParams } from '../services/recipeApi';
+import RecipeModal from './RecipeModal';
 
 interface RecipeSuggestionsProps {
   items: GroceryItem[];
@@ -12,6 +13,7 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(false);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   const fetchRecipes = useCallback(async () => {
     setLoading(true);
@@ -246,7 +248,10 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
                     </span>
                   ))}
                 </div>
-                <button className="text-primary-500 hover:text-primary-600 text-sm font-medium">
+                <button 
+                  onClick={() => setSelectedRecipe(recipe)}
+                  className="text-primary-500 hover:text-primary-600 text-sm font-medium"
+                >
                   View Recipe
                 </button>
               </div>
@@ -263,6 +268,14 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
           <h3 className="text-lg font-medium text-gray-900 mb-2">No recipes found</h3>
           <p className="text-gray-500">Try adjusting your search or filters</p>
         </div>
+      )}
+
+      {/* Recipe Modal */}
+      {selectedRecipe && (
+        <RecipeModal
+          recipe={selectedRecipe}
+          onClose={() => setSelectedRecipe(null)}
+        />
       )}
     </div>
   );

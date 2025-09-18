@@ -66,15 +66,28 @@ export const parseVoiceInput = (transcript: string): ParsedItem[] => {
         let quantity = 1;
         let unit = 'piece';
         
-        // Look for quantity and unit near this food item
-        const foodIndex = words.findIndex(word => 
-          food.name.toLowerCase().includes(word.toLowerCase()) ||
-          food.aliases.some(alias => alias.toLowerCase().includes(word.toLowerCase()))
-        );
+        // Find the best match for this food item in the words
+        let bestMatchIndex = -1;
+        let bestMatchLength = 0;
         
-        if (foodIndex !== -1) {
-          // Look for quantity before the food item
-          for (let i = Math.max(0, foodIndex - 3); i < foodIndex; i++) {
+        for (let i = 0; i < words.length; i++) {
+          const word = words[i].toLowerCase();
+          const foodName = food.name.toLowerCase();
+          const aliases = food.aliases.map(alias => alias.toLowerCase());
+          
+          // Check if this word matches the food name or any alias
+          if (word === foodName || aliases.includes(word) || 
+              foodName.includes(word) || aliases.some(alias => alias.includes(word))) {
+            if (word.length > bestMatchLength) {
+              bestMatchIndex = i;
+              bestMatchLength = word.length;
+            }
+          }
+        }
+        
+        if (bestMatchIndex !== -1) {
+          // Look for quantity before the food item (within 2 words)
+          for (let i = Math.max(0, bestMatchIndex - 2); i < bestMatchIndex; i++) {
             const word = words[i];
             if (quantityMap[word]) {
               quantity = quantityMap[word];
@@ -85,8 +98,8 @@ export const parseVoiceInput = (transcript: string): ParsedItem[] => {
             }
           }
           
-          // Look for unit after the food item
-          for (let i = foodIndex + 1; i < Math.min(words.length, foodIndex + 4); i++) {
+          // Look for unit after the food item (within 2 words)
+          for (let i = bestMatchIndex + 1; i < Math.min(words.length, bestMatchIndex + 3); i++) {
             const word = words[i];
             if (unitMap[word]) {
               unit = unitMap[word];
