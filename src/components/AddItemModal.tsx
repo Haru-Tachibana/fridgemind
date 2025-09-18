@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { GroceryItem, ShoppingListItem, GroceryCategory } from '../types';
 import { categorizeItem, estimateExpiryDate } from '../utils/helpers';
+import { parseVoiceInput } from '../utils/voiceParser';
+import { Mic, MicOff, Beef, Carrot, Milk, Apple, Wheat, Package } from 'lucide-react';
 
 type TabType = 'fridge' | 'recipes' | 'shopping';
 
@@ -24,14 +26,15 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
   const [unit, setUnit] = useState('piece');
   const [isMustHave, setIsMustHave] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
+  const [voiceAnimation, setVoiceAnimation] = useState(false);
 
-  const categories: { value: GroceryCategory; label: string; icon: string }[] = [
-    { value: 'meat', label: 'Meat', icon: '🥩' },
-    { value: 'vegetables', label: 'Vegetables', icon: '🥦' },
-    { value: 'dairy', label: 'Dairy', icon: '🥛' },
-    { value: 'fruits', label: 'Fruits', icon: '🍎' },
-    { value: 'grains', label: 'Grains', icon: '🌾' },
-    { value: 'other', label: 'Other', icon: '📦' },
+  const categories: { value: GroceryCategory; label: string; icon: React.ComponentType<any> }[] = [
+    { value: 'meat', label: 'Meat', icon: Beef },
+    { value: 'vegetables', label: 'Vegetables', icon: Carrot },
+    { value: 'dairy', label: 'Dairy', icon: Milk },
+    { value: 'fruits', label: 'Fruits', icon: Apple },
+    { value: 'grains', label: 'Grains', icon: Wheat },
+    { value: 'other', label: 'Other', icon: Package },
   ];
 
   const units = ['piece', 'kg', 'g', 'lb', 'oz', 'liter', 'ml', 'cup', 'tbsp', 'tsp'];
@@ -76,6 +79,8 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
     }
 
     setIsRecording(true);
+    setVoiceAnimation(true);
+    
     const recognition = new (window as any).webkitSpeechRecognition();
     recognition.continuous = false;
     recognition.interimResults = false;
@@ -83,17 +88,59 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
     recognition.onresult = (event: any) => {
       const transcript = event.results[0][0].transcript;
-      setItemName(transcript);
-      setCategory(categorizeItem(transcript));
+      const parsedItems = parseVoiceInput(transcript);
+      
+      if (parsedItems.length > 0) {
+        // If multiple items, add them all
+        if (parsedItems.length > 1) {
+          parsedItems.forEach((item, index) => {
+            setTimeout(() => {
+              if (activeTab === 'fridge') {
+                onAddGroceryItem({
+                  name: item.name,
+                  category: item.category,
+                  expiryDate: estimateExpiryDate(item.name, item.category),
+                  addedDate: new Date(),
+                  quantity: item.quantity,
+                  unit: item.unit,
+                });
+              } else {
+                onAddShoppingItem({
+                  name: item.name,
+                  category: item.category,
+                  isMustHave: false,
+                  autoAdd: false,
+                });
+              }
+            }, index * 100); // Stagger the additions
+          });
+          onClose();
+        } else {
+          // Single item - populate form
+          const item = parsedItems[0];
+          setItemName(item.name);
+          setCategory(item.category);
+          setQuantity(item.quantity);
+          setUnit(item.unit);
+        }
+      } else {
+        // Fallback to original behavior
+        setItemName(transcript);
+        setCategory(categorizeItem(transcript));
+      }
+      
       setIsRecording(false);
+      setVoiceAnimation(false);
     };
 
     recognition.onerror = () => {
       setIsRecording(false);
+      setVoiceAnimation(false);
     };
 
     recognition.onend = () => {
       setIsRecording(false);
+      setVoiceAnimation(false);
     };
 
     recognition.start();
@@ -101,7 +148,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end z-50">
-      <div className="bg-white rounded-t-2xl w-full max-w-md mx-auto max-h-[80vh] overflow-y-auto">
+      <div className="bg-white rounded-t-2xl w-full max-w-2xl mx-auto max-h-[80vh] overflow-y-auto">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-gray-900">
@@ -124,25 +171,40 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
                 Item Name
               </label>
               <div className="flex space-x-2">
-                <input
-                  type="text"
-                  value={itemName}
-                  onChange={(e) => setItemName(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500"
-                  placeholder="Enter item name..."
-                  required
-                />
+                <div className="flex-1 relative">
+                  <input
+                    type="text"
+                    value={itemName}
+                    onChange={(e) => setItemName(e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 transition-all ${
+                      voiceAnimation 
+                        ? 'border-primary-500 bg-primary-50 animate-pulse' 
+                        : 'border-gray-300'
+                    }`}
+                    placeholder="Enter item name..."
+                    required
+                  />
+                  {voiceAnimation && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="flex space-x-1">
+                        <div className="w-1 h-4 bg-primary-500 rounded animate-bounce"></div>
+                        <div className="w-1 h-4 bg-primary-500 rounded animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                        <div className="w-1 h-4 bg-primary-500 rounded animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                      </div>
+                    </div>
+                  )}
+                </div>
                 <button
                   type="button"
                   onClick={handleVoiceInput}
                   disabled={isRecording}
-                  className={`px-3 py-2 rounded-md transition-colors ${
+                  className={`px-3 py-2 rounded-md transition-all ${
                     isRecording
-                      ? 'bg-red-500 text-white'
+                      ? 'bg-accent-500 text-white animate-pulse'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
-                  {isRecording ? '🎤' : '🎤'}
+                  {isRecording ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                 </button>
               </div>
             </div>
@@ -165,7 +227,7 @@ const AddItemModal: React.FC<AddItemModalProps> = ({
                     }`}
                   >
                     <div className="text-center">
-                      <div className="text-2xl mb-1">{cat.icon}</div>
+                      <cat.icon className="w-6 h-6 mx-auto mb-1 text-gray-600" />
                       <div className="text-xs font-medium">{cat.label}</div>
                     </div>
                   </button>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { GroceryItem, Recipe } from '../types';
+import { ChefHat, Search, Clock, Users } from 'lucide-react';
 
 interface RecipeSuggestionsProps {
   items: GroceryItem[];
@@ -113,10 +114,10 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
 
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto px-4 py-8">
+      <div className="w-full px-4 py-8">
         <div className="text-center">
           <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-4xl">🍳</span>
+            <ChefHat className="w-12 h-12 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No ingredients available</h3>
           <p className="text-gray-500">Add some groceries to get recipe suggestions!</p>
@@ -126,7 +127,7 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6">
+    <div className="w-full px-4 py-6">
       {/* Search and Filters */}
       <div className="mb-6 space-y-4">
         <div className="relative">
@@ -137,9 +138,7 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
           />
-          <svg className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
+          <Search className="absolute left-3 top-2.5 w-5 h-5 text-gray-400" />
         </div>
 
         <div className="flex space-x-2 overflow-x-auto pb-2">
@@ -173,8 +172,14 @@ const RecipeSuggestions: React.FC<RecipeSuggestionsProps> = ({ items }) => {
                 <h3 className="font-medium text-gray-900 mb-1">{recipe.name}</h3>
                 <p className="text-sm text-gray-600 mb-2">{recipe.description}</p>
                 <div className="flex items-center space-x-4 text-xs text-gray-500">
-                  <span>⏱️ {recipe.prepTime + recipe.cookTime} min</span>
-                  <span>👥 {recipe.servings} servings</span>
+                  <div className="flex items-center space-x-1">
+                    <Clock className="w-3 h-3" />
+                    <span>{recipe.prepTime + recipe.cookTime} min</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <Users className="w-3 h-3" />
+                    <span>{recipe.servings} servings</span>
+                  </div>
                   {recipe.canMake && <span className="text-green-600 font-medium">✓ Can make</span>}
                 </div>
               </div>

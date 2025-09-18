@@ -1,3 +1,12 @@
+import { 
+  Beef, 
+  Carrot, 
+  Milk, 
+  Apple, 
+  Wheat, 
+  Package 
+} from 'lucide-react';
+
 export interface GroceryItem {
   id: string;
   name: string;
@@ -38,20 +47,20 @@ export interface NotificationSettings {
   enablePushNotifications: boolean;
 }
 
-export const CATEGORY_ICONS: Record<GroceryCategory, string> = {
-  meat: '🥩',
-  vegetables: '🥦',
-  dairy: '🥛',
-  fruits: '🍎',
-  grains: '🌾',
-  other: '📦'
+export const CATEGORY_ICONS: Record<GroceryCategory, React.ComponentType<any>> = {
+  meat: Beef,
+  vegetables: Carrot,
+  dairy: Milk,
+  fruits: Apple,
+  grains: Wheat,
+  other: Package
 };
 
 export const CATEGORY_COLORS: Record<GroceryCategory, string> = {
-  meat: 'bg-red-100 text-red-800',
-  vegetables: 'bg-green-100 text-green-800',
+  meat: 'bg-accent-100 text-accent-800',
+  vegetables: 'bg-primary-100 text-primary-800',
   dairy: 'bg-blue-100 text-blue-800',
-  fruits: 'bg-yellow-100 text-yellow-800',
+  fruits: 'bg-secondary-100 text-secondary-800',
   grains: 'bg-amber-100 text-amber-800',
   other: 'bg-gray-100 text-gray-800'
 };

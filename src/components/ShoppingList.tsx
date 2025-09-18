@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ShoppingListItem, CATEGORY_ICONS, CATEGORY_COLORS } from '../types';
+import { ShoppingCart, Download, Plus, X } from 'lucide-react';
 
 interface ShoppingListProps {
   items: ShoppingListItem[];
@@ -19,12 +20,12 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
   const [showAddForm, setShowAddForm] = useState(false);
 
   const categories = [
-    { value: 'meat', label: 'Meat', icon: '🥩' },
-    { value: 'vegetables', label: 'Vegetables', icon: '🥦' },
-    { value: 'dairy', label: 'Dairy', icon: '🥛' },
-    { value: 'fruits', label: 'Fruits', icon: '🍎' },
-    { value: 'grains', label: 'Grains', icon: '🌾' },
-    { value: 'other', label: 'Other', icon: '📦' },
+    { value: 'meat', label: 'Meat', icon: CATEGORY_ICONS.meat },
+    { value: 'vegetables', label: 'Vegetables', icon: CATEGORY_ICONS.vegetables },
+    { value: 'dairy', label: 'Dairy', icon: CATEGORY_ICONS.dairy },
+    { value: 'fruits', label: 'Fruits', icon: CATEGORY_ICONS.fruits },
+    { value: 'grains', label: 'Grains', icon: CATEGORY_ICONS.grains },
+    { value: 'other', label: 'Other', icon: CATEGORY_ICONS.other },
   ];
 
   const handleAddItem = (e: React.FormEvent) => {
@@ -69,22 +70,24 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6">
+    <div className="w-full px-4 py-6">
       {/* Header Actions */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-xl font-bold text-gray-900">Shopping List</h2>
         <div className="flex space-x-2">
           <button
             onClick={exportList}
-            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors"
+            className="px-3 py-1 bg-gray-100 text-gray-700 rounded-lg text-sm hover:bg-gray-200 transition-colors flex items-center space-x-1"
           >
-            Export
+            <Download className="w-4 h-4" />
+            <span>Export</span>
           </button>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="px-3 py-1 bg-primary-500 text-white rounded-lg text-sm hover:bg-primary-600 transition-colors"
+            className="px-3 py-1 bg-primary-500 text-white rounded-lg text-sm hover:bg-primary-600 transition-colors flex items-center space-x-1"
           >
-            Add Item
+            <Plus className="w-4 h-4" />
+            <span>Add Item</span>
           </button>
         </div>
       </div>
@@ -124,7 +127,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
                     }`}
                   >
                     <div className="text-center">
-                      <div className="text-lg">{cat.icon}</div>
+                      <cat.icon className="w-5 h-5 mx-auto mb-1 text-gray-600" />
                       <div className="text-xs font-medium">{cat.label}</div>
                     </div>
                   </button>
@@ -166,7 +169,9 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <span className="text-xl">{CATEGORY_ICONS[item.category]}</span>
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      {React.createElement(CATEGORY_ICONS[item.category], { className: "w-5 h-5 text-gray-600" })}
+                    </div>
                     <div>
                       <h4 className="font-medium text-gray-900">{item.name}</h4>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${CATEGORY_COLORS[item.category]}`}>
@@ -187,9 +192,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
                       onClick={() => handleRemoveItem(item.id)}
                       className="text-gray-400 hover:text-red-500"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
@@ -211,7 +214,9 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <span className="text-xl">{CATEGORY_ICONS[item.category]}</span>
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      {React.createElement(CATEGORY_ICONS[item.category], { className: "w-5 h-5 text-gray-600" })}
+                    </div>
                     <div>
                       <h4 className="font-medium text-gray-900">{item.name}</h4>
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${CATEGORY_COLORS[item.category]}`}>
@@ -232,9 +237,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
                       onClick={() => handleRemoveItem(item.id)}
                       className="text-gray-400 hover:text-red-500"
                     >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                      </svg>
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
                 </div>
@@ -248,7 +251,7 @@ const ShoppingList: React.FC<ShoppingListProps> = ({
       {items.length === 0 && (
         <div className="text-center py-8">
           <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-4xl">🛒</span>
+            <ShoppingCart className="w-12 h-12 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Your shopping list is empty</h3>
           <p className="text-gray-500">Add items to get started!</p>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { GroceryItem, CATEGORY_ICONS, CATEGORY_COLORS } from '../types';
 import { formatDate, getDaysUntilExpiry, getExpiryStatus, getExpiryStatusColor } from '../utils/helpers';
+import { Refrigerator } from 'lucide-react';
 
 interface FridgeInventoryProps {
   items: GroceryItem[];
@@ -36,10 +37,10 @@ const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem }
 
   if (items.length === 0) {
     return (
-      <div className="max-w-md mx-auto px-4 py-8">
+      <div className="w-full px-4 py-8">
         <div className="text-center">
           <div className="w-24 h-24 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
-            <span className="text-4xl">🧊</span>
+            <Refrigerator className="w-12 h-12 text-gray-400" />
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">Your fridge is empty</h3>
           <p className="text-gray-500">Add some groceries to get started!</p>
@@ -49,7 +50,7 @@ const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem }
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6">
+    <div className="w-full px-4 py-6">
       {/* Filters and Sort */}
       <div className="mb-6 space-y-4">
         <div className="flex space-x-2 overflow-x-auto pb-2">
@@ -96,7 +97,9 @@ const FridgeInventory: React.FC<FridgeInventoryProps> = ({ items, onRemoveItem }
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2 mb-2">
-                    <span className="text-2xl">{CATEGORY_ICONS[item.category]}</span>
+                    <div className="p-2 bg-gray-100 rounded-lg">
+                      {React.createElement(CATEGORY_ICONS[item.category], { className: "w-5 h-5 text-gray-600" })}
+                    </div>
                     <div>
                       <h3 className="font-medium text-gray-900">{item.name}</h3>
                       <div className="flex items-center space-x-2">

@@ -105,7 +105,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header onSettingsClick={() => setShowSettings(true)} />
-      <main className="pb-20">
+      <main className="pb-20 w-full">
         {renderActiveTab()}
       </main>
       <Navigation activeTab={activeTab} onTabChange={setActiveTab} />
