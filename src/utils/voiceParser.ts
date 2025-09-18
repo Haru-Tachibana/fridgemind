@@ -57,42 +57,44 @@ export const parseVoiceInput = (transcript: string): ParsedItem[] => {
   for (const sentence of sentences) {
     const words = sentence.split(/\s+/);
     
-    // Find quantity
-    let quantity = 1;
-    let quantityIndex = -1;
-    
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      if (quantityMap[word]) {
-        quantity = quantityMap[word];
-        quantityIndex = i;
-        break;
-      } else if (!isNaN(Number(word))) {
-        quantity = Number(word);
-        quantityIndex = i;
-        break;
-      }
-    }
-
-    // Find unit
-    let unit = 'piece';
-    let unitIndex = -1;
-    
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      if (unitMap[word]) {
-        unit = unitMap[word];
-        unitIndex = i;
-        break;
-      }
-    }
-
-    // Try to find food items in the sentence
+    // Try to find food items in the sentence first
     const foundFoods = findFoodItems(sentence);
     
     if (foundFoods.length > 0) {
-      // Use found food items
+      // For each found food, try to find its specific quantity and unit
       for (const food of foundFoods) {
+        let quantity = 1;
+        let unit = 'piece';
+        
+        // Look for quantity and unit near this food item
+        const foodIndex = words.findIndex(word => 
+          food.name.toLowerCase().includes(word.toLowerCase()) ||
+          food.aliases.some(alias => alias.toLowerCase().includes(word.toLowerCase()))
+        );
+        
+        if (foodIndex !== -1) {
+          // Look for quantity before the food item
+          for (let i = Math.max(0, foodIndex - 3); i < foodIndex; i++) {
+            const word = words[i];
+            if (quantityMap[word]) {
+              quantity = quantityMap[word];
+              break;
+            } else if (!isNaN(Number(word))) {
+              quantity = Number(word);
+              break;
+            }
+          }
+          
+          // Look for unit after the food item
+          for (let i = foodIndex + 1; i < Math.min(words.length, foodIndex + 4); i++) {
+            const word = words[i];
+            if (unitMap[word]) {
+              unit = unitMap[word];
+              break;
+            }
+          }
+        }
+        
         items.push({
           name: food.name,
           quantity: quantity,
@@ -101,7 +103,36 @@ export const parseVoiceInput = (transcript: string): ParsedItem[] => {
         });
       }
     } else {
-      // Fallback to original logic
+      // Fallback to original logic for single items
+      let quantity = 1;
+      let quantityIndex = -1;
+      
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        if (quantityMap[word]) {
+          quantity = quantityMap[word];
+          quantityIndex = i;
+          break;
+        } else if (!isNaN(Number(word))) {
+          quantity = Number(word);
+          quantityIndex = i;
+          break;
+        }
+      }
+
+      // Find unit
+      let unit = 'piece';
+      let unitIndex = -1;
+      
+      for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        if (unitMap[word]) {
+          unit = unitMap[word];
+          unitIndex = i;
+          break;
+        }
+      }
+
       const nameWords = words.filter((word, index) => {
         if (index === quantityIndex || index === unitIndex) return false;
         if (['of', 'the', 'a', 'an', 'some', 'about'].includes(word)) return false;

@@ -20,15 +20,15 @@ const Navigation: React.FC<NavigationProps> = ({ activeTab, onTabChange }) => {
       <div className="w-full">
         <div className="flex">
           {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => onTabChange(tab.id)}
-              className={`flex-1 flex flex-col items-center py-3 px-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'text-primary-500 bg-primary-50'
-                  : 'text-gray-500 hover:text-gray-700'
-              }`}
-            >
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className={`flex-1 flex flex-col items-center py-3 px-2 transition-colors ${
+                    activeTab === tab.id
+                      ? 'text-white bg-primary-600 shadow-lg'
+                      : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'
+                  }`}
+                >
               <tab.icon className="w-6 h-6 mb-1" />
               <span className="text-xs font-medium">{tab.label}</span>
             </button>
