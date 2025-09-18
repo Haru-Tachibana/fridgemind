@@ -6,7 +6,7 @@ import { demoGroceryItems, demoShoppingItems } from '../data/demoData';
 
 interface SettingsProps {
   onClose: () => void;
-  onLoadDemoData?: () => void;
+  onLoadDemoData?: () => Promise<void>;
 }
 
 const Settings: React.FC<SettingsProps> = ({ onClose, onLoadDemoData }) => {

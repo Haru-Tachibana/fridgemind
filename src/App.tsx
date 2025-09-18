@@ -27,32 +27,53 @@ function App() {
 
   // Initialize authentication and load user data
   useEffect(() => {
-    const authService = AuthService.getInstance();
-    const authState = authService.getState();
-    
-    if (authState.isAuthenticated && authState.user) {
-      setUser(authState.user);
-      // Load user-specific data
-      setGroceryItems(storage.getGroceryItems(authState.user.id));
-      setShoppingList(storage.getShoppingList(authState.user.id));
-    } else {
-      // Load demo data for non-authenticated users
-      setGroceryItems(storage.getGroceryItems());
-      setShoppingList(storage.getShoppingList());
-    }
-    
-    setIsLoading(false);
+    const loadData = async () => {
+      const authService = AuthService.getInstance();
+      const authState = authService.getState();
+      
+      if (authState.isAuthenticated && authState.user) {
+        setUser(authState.user);
+        // Load user-specific data
+        const [groceryData, shoppingData] = await Promise.all([
+          storage.getGroceryItems(authState.user.id),
+          storage.getShoppingList(authState.user.id)
+        ]);
+        setGroceryItems(groceryData);
+        setShoppingList(shoppingData);
+      } else {
+        // Load demo data for non-authenticated users
+        const [groceryData, shoppingData] = await Promise.all([
+          storage.getGroceryItems(),
+          storage.getShoppingList()
+        ]);
+        setGroceryItems(groceryData);
+        setShoppingList(shoppingData);
+      }
+      
+      setIsLoading(false);
+    };
+
+    loadData();
 
     // Subscribe to auth state changes
-    const unsubscribe = authService.subscribe((newState) => {
+    const authService = AuthService.getInstance();
+    const unsubscribe = authService.subscribe(async (newState) => {
       if (newState.isAuthenticated && newState.user) {
         setUser(newState.user);
-        setGroceryItems(storage.getGroceryItems(newState.user.id));
-        setShoppingList(storage.getShoppingList(newState.user.id));
+        const [groceryData, shoppingData] = await Promise.all([
+          storage.getGroceryItems(newState.user.id),
+          storage.getShoppingList(newState.user.id)
+        ]);
+        setGroceryItems(groceryData);
+        setShoppingList(shoppingData);
       } else {
         setUser(null);
-        setGroceryItems(storage.getGroceryItems());
-        setShoppingList(storage.getShoppingList());
+        const [groceryData, shoppingData] = await Promise.all([
+          storage.getGroceryItems(),
+          storage.getShoppingList()
+        ]);
+        setGroceryItems(groceryData);
+        setShoppingList(shoppingData);
       }
     });
 
@@ -72,11 +93,17 @@ function App() {
 
   // Save data whenever it changes
   useEffect(() => {
-    storage.saveGroceryItems(groceryItems, user?.id);
+    const saveGroceryData = async () => {
+      await storage.saveGroceryItems(groceryItems, user?.id);
+    };
+    saveGroceryData();
   }, [groceryItems, user?.id]);
 
   useEffect(() => {
-    storage.saveShoppingList(shoppingList, user?.id);
+    const saveShoppingData = async () => {
+      await storage.saveShoppingList(shoppingList, user?.id);
+    };
+    saveShoppingData();
   }, [shoppingList, user?.id]);
 
   const addGroceryItem = (item: Omit<GroceryItem, 'id'>) => {
@@ -224,9 +251,13 @@ function App() {
       {showSettings && (
         <Settings 
           onClose={() => setShowSettings(false)}
-          onLoadDemoData={() => {
-            setGroceryItems(storage.getGroceryItems());
-            setShoppingList(storage.getShoppingList());
+          onLoadDemoData={async () => {
+            const [groceryData, shoppingData] = await Promise.all([
+              storage.getGroceryItems(),
+              storage.getShoppingList()
+            ]);
+            setGroceryItems(groceryData);
+            setShoppingList(shoppingData);
           }}
         />
       )}

@@ -1,4 +1,10 @@
 import { GroceryItem, ShoppingListItem, NotificationSettings } from '../types';
+import { 
+  getGroceryItems as getGroceryItemsFromDB, 
+  saveGroceryItems as saveGroceryItemsToDB,
+  getShoppingList as getShoppingListFromDB,
+  saveShoppingList as saveShoppingListToDB
+} from '../services/database';
 
 const STORAGE_KEYS = {
   GROCERY_ITEMS: 'fridgemind_grocery_items',
@@ -12,51 +18,71 @@ const getStorageKey = (baseKey: string, userId?: string): string => {
 
 export const storage = {
   // Grocery Items
-  getGroceryItems: (userId?: string): GroceryItem[] => {
+  getGroceryItems: async (userId?: string): Promise<GroceryItem[]> => {
     try {
-      const key = getStorageKey(STORAGE_KEYS.GROCERY_ITEMS, userId);
-      const items = localStorage.getItem(key);
-      if (!items) return [];
-      return JSON.parse(items).map((item: any) => ({
-        ...item,
-        expiryDate: new Date(item.expiryDate),
-        addedDate: new Date(item.addedDate),
-      }));
+      if (userId) {
+        return await getGroceryItemsFromDB(userId);
+      } else {
+        // Fallback to localStorage for non-authenticated users
+        const key = getStorageKey(STORAGE_KEYS.GROCERY_ITEMS, userId);
+        const items = localStorage.getItem(key);
+        if (!items) return [];
+        return JSON.parse(items).map((item: any) => ({
+          ...item,
+          expiryDate: new Date(item.expiryDate),
+          addedDate: new Date(item.addedDate),
+        }));
+      }
     } catch (error) {
       console.error('Error loading grocery items:', error);
       return [];
     }
   },
 
-  saveGroceryItems: (items: GroceryItem[], userId?: string): void => {
+  saveGroceryItems: async (items: GroceryItem[], userId?: string): Promise<void> => {
     try {
-      const key = getStorageKey(STORAGE_KEYS.GROCERY_ITEMS, userId);
-      localStorage.setItem(key, JSON.stringify(items));
+      if (userId) {
+        await saveGroceryItemsToDB(userId, items);
+      } else {
+        // Fallback to localStorage for non-authenticated users
+        const key = getStorageKey(STORAGE_KEYS.GROCERY_ITEMS, userId);
+        localStorage.setItem(key, JSON.stringify(items));
+      }
     } catch (error) {
       console.error('Error saving grocery items:', error);
     }
   },
 
   // Shopping List
-  getShoppingList: (userId?: string): ShoppingListItem[] => {
+  getShoppingList: async (userId?: string): Promise<ShoppingListItem[]> => {
     try {
-      const key = getStorageKey(STORAGE_KEYS.SHOPPING_LIST, userId);
-      const items = localStorage.getItem(key);
-      if (!items) return [];
-      return JSON.parse(items).map((item: any) => ({
-        ...item,
-        lastPurchased: item.lastPurchased ? new Date(item.lastPurchased) : undefined,
-      }));
+      if (userId) {
+        return await getShoppingListFromDB(userId);
+      } else {
+        // Fallback to localStorage for non-authenticated users
+        const key = getStorageKey(STORAGE_KEYS.SHOPPING_LIST, userId);
+        const items = localStorage.getItem(key);
+        if (!items) return [];
+        return JSON.parse(items).map((item: any) => ({
+          ...item,
+          lastPurchased: item.lastPurchased ? new Date(item.lastPurchased) : undefined,
+        }));
+      }
     } catch (error) {
       console.error('Error loading shopping list:', error);
       return [];
     }
   },
 
-  saveShoppingList: (items: ShoppingListItem[], userId?: string): void => {
+  saveShoppingList: async (items: ShoppingListItem[], userId?: string): Promise<void> => {
     try {
-      const key = getStorageKey(STORAGE_KEYS.SHOPPING_LIST, userId);
-      localStorage.setItem(key, JSON.stringify(items));
+      if (userId) {
+        await saveShoppingListToDB(userId, items);
+      } else {
+        // Fallback to localStorage for non-authenticated users
+        const key = getStorageKey(STORAGE_KEYS.SHOPPING_LIST, userId);
+        localStorage.setItem(key, JSON.stringify(items));
+      }
     } catch (error) {
       console.error('Error saving shopping list:', error);
     }

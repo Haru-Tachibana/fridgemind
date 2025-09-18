@@ -1,5 +1,5 @@
-// Simple authentication service using localStorage
-// In a real app, this would connect to a backend API
+// Authentication service using Supabase database
+import { createUser, getUserByEmail } from './database';
 
 export interface User {
   id: string;
@@ -78,21 +78,19 @@ class AuthService {
 
   async signUp(email: string, password: string, name: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
       // Check if user already exists
-      const existingUser = localStorage.getItem('fridgemind_user');
+      const existingUser = await getUserByEmail(email);
       if (existingUser) {
         return { success: false, error: 'User already exists' };
       }
 
-      // Create new user
+      // Create new user in database
+      const userData = await createUser(email, name);
       const user: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        email,
-        name,
-        createdAt: new Date(),
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        createdAt: new Date(userData.created_at),
       };
 
       this.saveUserToStorage(user);
@@ -105,30 +103,29 @@ class AuthService {
       this.notifyListeners();
       return { success: true };
     } catch (error) {
+      console.error('Sign up error:', error);
       return { success: false, error: 'Failed to create account' };
     }
   }
 
   async signIn(email: string, password: string): Promise<{ success: boolean; error?: string }> {
     try {
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      const userData = localStorage.getItem('fridgemind_user');
+      // Find user in database
+      const userData = await getUserByEmail(email);
       if (!userData) {
         return { success: false, error: 'No account found' };
       }
 
-      const user = JSON.parse(userData);
-      if (user.email !== email) {
-        return { success: false, error: 'Invalid credentials' };
-      }
+      const user: User = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        createdAt: new Date(userData.created_at),
+      };
 
+      this.saveUserToStorage(user);
       this.state = {
-        user: {
-          ...user,
-          createdAt: new Date(user.createdAt),
-        },
+        user,
         isAuthenticated: true,
         isLoading: false,
       };
@@ -136,6 +133,7 @@ class AuthService {
       this.notifyListeners();
       return { success: true };
     } catch (error) {
+      console.error('Sign in error:', error);
       return { success: false, error: 'Failed to sign in' };
     }
   }
@@ -151,8 +149,7 @@ class AuthService {
   }
 
   async resetPassword(email: string): Promise<{ success: boolean; error?: string }> {
-    // Simulate password reset
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // For now, just return success - in a real app, you'd integrate with email service
     return { success: true };
   }
 }
