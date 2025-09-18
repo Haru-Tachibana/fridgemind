@@ -1,6 +1,6 @@
 import React from 'react';
 import { User as UserIcon, LogOut, Calendar } from 'lucide-react';
-import SimpleAuthService, { User } from '../services/simpleAuth';
+import AuthService, { User } from '../services/auth';
 
 interface UserProfileProps {
   user: User;
@@ -10,7 +10,7 @@ interface UserProfileProps {
 
 const UserProfile: React.FC<UserProfileProps> = ({ user, onSignOut, onClose }) => {
   const handleSignOut = async () => {
-    await SimpleAuthService.getInstance().signOut();
+    await AuthService.getInstance().signOut();
     onSignOut();
     onClose();
   };
